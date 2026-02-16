@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Рецепты</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+<h1>Рецепты</h1>
+
+<div class="form">
+    <input id="title" placeholder="Название">
+    <input id="ingredients" placeholder="Ингредиенты (через запятую)">
+    <input id="steps" placeholder="Шаги (через запятую)">
+    <input id="tags" placeholder="Теги (через запятую)">
+    <button onclick="createRecipe()">Создать</button>
+</div>
+
+<hr>
+
+<input id="filterSearch" placeholder="Поиск по тегу или ингредиенту" style="width: 200px;">
+<button onclick="loadRecipes()">Поиск</button>
+
+<div id="recipes"></div>
+
+<script src="/static/app.js"></script>
+
+</body>
+</html>
