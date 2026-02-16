@@ -24,6 +24,6 @@ uvicorn app.main:app --reload
 | HTTP-коды 200, 201, 404 | Готово |
 | FastAPI, Pydantic, SQLAlchemy, SQLite | Готово |
 | Структура: модели, crud, маршруты | Готово |
-| Ruff (все правила) | Нет конфига в проекте |
-| ty (type checker) | Не настроено |
-| Тесты pytest | Нет тестов в проекте |
+| Ruff (все правила) | Проходит |
+| ty (type checker) | Проходит |
+| Тесты pytest | Тест пройден успешно |
