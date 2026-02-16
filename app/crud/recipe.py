@@ -1,33 +1,60 @@
-from sqlalchemy.orm import Session
-from app import schemas
-from app.models import Recipe
-from fastapi import HTTPException, status
-from typing import List, Optional
+"""CRUD-операции для рецептов."""
 
-def get_recipe(db: Session, recipe_id: int) -> Optional[Recipe]:
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
+from app.models import Recipe
+
+if TYPE_CHECKING:
+    from sqlalchemy.orm import Session
+
+    from app import schemas
+
+
+def get_recipe(db: Session, recipe_id: int) -> Recipe | None:
+    """Вернуть рецепт по id или None."""
     return db.query(Recipe).filter(Recipe.id == recipe_id).first()
 
-def list_recipes(db: Session, tag: Optional[str] = None, ingredient: Optional[str] = None, q: Optional[str] = None) -> List[Recipe]:
+
+def list_recipes(
+    db: Session,
+    tag: str | None = None,
+    ingredient: str | None = None,
+    q: str | None = None,
+) -> list[Recipe]:
+    """Вернуть рецепты с опциональной фильтрацией по тегу, ингредиенту или общему поиску."""
     query = db.query(Recipe)
     results = query.all()
     if q:
         q_trim = q.strip().lower()
         if q_trim:
             results = [
-                r for r in results
+                r
+                for r in results
                 if (r.tags and any(q_trim in (t or "").lower() for t in r.tags))
                 or any(q_trim in (ing or "").lower() for ing in (r.ingredients or []))
             ]
     else:
         if tag:
             tag_lower = tag.lower()
-            results = [r for r in results if r.tags and any(tag_lower in (t or "").lower() for t in r.tags)]
+            results = [
+                r
+                for r in results
+                if r.tags and any(tag_lower in (t or "").lower() for t in r.tags)
+            ]
         if ingredient:
             ing_lower = ingredient.lower()
-            results = [r for r in results if any(ing_lower in (i or "").lower() for i in r.ingredients)]
+            results = [
+                r
+                for r in results
+                if any(ing_lower in (i or "").lower() for i in r.ingredients)
+            ]
     return results
 
+
 def create_recipe(db: Session, recipe_in: schemas.RecipeCreate) -> Recipe:
+    """Создать новый рецепт."""
     db_obj = Recipe(
         title=recipe_in.title.strip(),
         ingredients=recipe_in.ingredients,
@@ -39,7 +66,13 @@ def create_recipe(db: Session, recipe_in: schemas.RecipeCreate) -> Recipe:
     db.refresh(db_obj)
     return db_obj
 
-def update_recipe(db: Session, db_obj: Recipe, recipe_in: schemas.RecipeUpdate) -> Recipe:
+
+def update_recipe(
+    db: Session,
+    db_obj: Recipe,
+    recipe_in: schemas.RecipeUpdate,
+) -> Recipe:
+    """Обновить существующий рецепт."""
     if recipe_in.title is not None:
         db_obj.title = recipe_in.title.strip()
     if recipe_in.ingredients is not None:
@@ -52,6 +85,8 @@ def update_recipe(db: Session, db_obj: Recipe, recipe_in: schemas.RecipeUpdate) 
     db.refresh(db_obj)
     return db_obj
 
-def delete_recipe(db: Session, db_obj: Recipe):
+
+def delete_recipe(db: Session, db_obj: Recipe) -> None:
+    """Удалить рецепт."""
     db.delete(db_obj)
     db.commit()
